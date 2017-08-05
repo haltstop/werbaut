@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=320px initial-scale=1.0" />
+<title>Wer Baut denn jetzt?</title>
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" sizes="192x192" href="/icon.png">
+<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+</head>
+<body bgcolor="#b0d793" >
+
+
+
+
+<div id="inhalt" style="margin: 0 auto;width:320px;" align="center">
+<p><img src="pics/banner.jpg" width="320" height="80">
+</p>
+</div>
+
+<script type="text/javascript">
+	
+	var nodes = [];
+	var kandidaten = ["Alex","Wözel","Patrick","Chris"];
+	var ausgewaehlt = [];
+	var audio = new Audio("sounds/jeopardy.ogg");
+	
+	var div1 = document.getElementById("inhalt");
+	div1.style.font = "bold 18px Trebuchet MS"; 
+	
+	var g_wenig = new Image();
+  	g_wenig.src = "pics/g_wenig.png";
+  	g_wenig.style = "height:150px; width:150px"
+	
+	var g_normal = new Image();
+  	g_normal.src = "pics/g_normal.png";
+  	g_normal.style = "height:150px; width:150px"
+	
+	var g_viel = new Image();
+  	g_viel.src = "pics/g_viel.png";
+  	g_viel.style = "height:150px; width:150px"
+	
+	var g_sviel = new Image();
+  	g_sviel.src = "pics/g_viel.png";
+  	g_sviel.style = "height:150px; width:150px"
+	
+	
+	hauptmenue();
+	
+	function hauptmenue(){
+		loescheInhalt();
+		
+		//div1.style.border = "thick solid #0000FF"; 
+		addTxt(ausgewaehlt.length + " Kandidat" + (ausgewaehlt.length != 1 ? "en" : "") + " in der Auswahl", "13px", ausgewaehlt.length <= 1 ? "red" : "black")
+		addButton("neuer Kandidat",function(){kandidat()});
+		addButton("Kandidaten auswählen", function(){wahlKandidat()});
+		
+		bW = addButton("Los Geht's!", function(){los()});
+		bW.disabled = (ausgewaehlt.length <= 1);
+		bW.style.fontWeight = 'bold';
+		
+	}
+	
+	function los(){
+		
+		audio.play();
+		audio.addEventListener("ended", function(){
+   			  ergebnis();
+		});
+		
+		loescheInhalt();
+		var spinner = new Image();
+  		spinner.src = "pics/spinner.gif";
+  		//banner.style = "height:80px; width:320px"
+		nodes.push(spinner);
+		div1.appendChild(spinner);
+		
+		var warteText = [
+			"Der Tee muss noch ziehen.",
+			"Berechnungen werden durchgeführt.",
+			rndElem(ausgewaehlt) + " kann doch gar nicht bauen!",
+			"Einmal bitte kurz warten...",
+			"Knaaaarz.",
+			'"Ein guter Tipp ist die Grundlage eines jeden guten Joints"  -Jonathan',
+			"Eine Runde warten bitte!",
+			"Hier könnte dein Spruch stehen.",
+			"Wer wohl bauen muss? Ich tipp auf " + rndElem(ausgewaehlt) + "."		
+		];
+		
+		var txt1 = addTxt(rndElem(warteText),"15px","grey");
+		txt1.style.textAlign = "center";
+				
+	}
+	
+	function ergebnis(){
+		loescheInhalt();
+		var bauer = rndElem(ausgewaehlt)
+		addTxt("Glückwunsch " + bauer + "!!!", "24px", "black");
+		addTxt("Du musst jetzt bauen!", "20px", "grey");
+		
+		
+		
+		
+		var iMenge = getRandomInt(1,100);
+		var mengeTxt;
+		
+		
+		if(iMenge <= 20){
+			addImage(g_wenig);
+			mengeTxt = addTxt("mit wenig Gras.", "13px", "black");
+		}else if(iMenge <= 20+60){
+			addImage(g_normal);
+			mengeTxt = addTxt("mit normal viel Gras.", "13px", "black");
+		}else if(iMenge <= 20+60+19){
+			addImage(g_viel);
+			mengeTxt = addTxt("mit viel Gras.", "13px", "black");
+		}else{
+			addImage(g_sviel);
+			mengeTxt = addTxt("mit scheiße-viel Gras.", "13px", "red");
+		}
+		mengeTxt.style.textAlign = "center";
+		
+		addP();
+		addButton("Fertig gebaut.",function(){hauptmenue()});
+		
+	}
+	
+	function kandidat(){
+	    loescheInhalt();
+		addTxt("Name:");
+		var f1 = addField();
+		addP();
+		var b1 = addButton("Speichern",function(){
+			var exists = false;
+			
+			for(i in kandidaten){
+				if(kandidaten[i] == f1.value){
+					exists = true;
+				}
+				
+					
+			}
+			if(!exists){
+				kandidaten.push(f1.value);
+				ausgewaehlt.push(f1.value);				
+			}
+			
+			hauptmenue();
+		})
+		addButton("Zurück", function(){hauptmenue()})
+		
+		b1.disabled = true;
+		
+		f1.addEventListener("keyup",
+			function(){
+				b1.disabled = f1.value.trim() == "";				
+			}, 
+		false);
+			
+	}
+	
+	function wahlKandidat(){
+		loescheInhalt();
+		var bts = [];
+		for(i in kandidaten){
+			var isAusgewaehlt = false;
+			for(j in ausgewaehlt){
+				if(ausgewaehlt[j] == kandidaten[i]){
+					isAusgewaehlt = true;
+				}
+			}
+			
+			var b = addButton(kandidaten[i],null,true);	
+			
+			if(!isAusgewaehlt){
+				toggleButton(b);	
+			}
+			
+			bts.push(b);
+		}
+		addP();
+		addButton("Zurück", function(){
+			ausgewaehlt = [];
+			for(i in bts){
+				if(bts[i].name == "activated"){
+					ausgewaehlt.push(kandidaten[i]);
+				}					
+			}			
+			
+			hauptmenue()
+		});
+		
+	
+	}
+	
+	
+	
+	function addField(){
+		var field = document.createElement("input");
+		field.style = "height:30px; width:320px"
+		field.style.fontSize = "18px";
+		div1.appendChild(field);
+		nodes.push(field);
+		return field;
+	}
+	
+	function addP(){
+		var txtP = document.createElement("p");
+		div1.appendChild(txtP);
+		nodes.push(txtP);	
+		return txtP;			
+	}
+	
+	function addTxt(string){
+		 return addTxt(string, null, null);
+	}
+		
+	function addTxt(string, size, color){
+		var txtP = addP();
+		var txtNode = document.createTextNode(string);
+		txtP.style.textAlign = "left";
+		//txtNode.data.style.
+		if(color != null){
+			txtP.style.color = color;
+		}
+		if(size != null){
+			txtP.style.fontSize = size;	
+		}
+				
+		txtP.appendChild(txtNode);
+		return txtP;
+	}
+	
+	function addImage(img){
+		nodes.push(img);
+		div1.appendChild(img);	
+		
+	}
+	
+	function addButton(name, fkt){
+		return addButton(name, fkt, false);	
+	}
+	
+	
+	function addButton(name, fkt, chooseButton){
+		var b1 = document.createElement("input");
+		
+		b1.type = "button";
+		b1.name = name;
+		b1.value = name;
+		b1.style = "height:50px; width:320px;"
+		
+		b1.onclick = fkt;
+			
+		if(chooseButton){
+			b1.style.borderStyle = "insed";	
+			b1.style.borderWidth = "5px";
+			toggleButton(b1);
+			
+			b1.addEventListener("click",function(){
+				toggleButton(b1);
+				
+			},false);
+						
+		}
+		
+		
+		
+		
+		nodes.push(b1);
+		div1.appendChild(b1);
+		return b1;
+		
+	}
+	
+	function toggleButton(b1){
+		
+		if(b1.name == "activated"){
+			b1.name = "deactivated";	
+			
+			b1.style.borderColor = "red";
+		}else{
+			b1.name = "activated";
+				
+			b1.style.borderColor = "#27df0f";
+		}
+	}
+	
+	
+	function loescheInhalt(){
+		for(i = 0; i < nodes.length; i++){
+			nodes[i].remove();
+			//buttons.splice(i,1);			
+		}
+			
+	}
+	
+	function getRandomInt(min, max) {
+   		 return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	
+	function rndElem(list){
+		return list[getRandomInt(0, list.length-1)]	;
+	}
+
+  </script>
+</body>
