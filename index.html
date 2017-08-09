@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=320px initial-scale=1.0" />
 <title>Wer Baut denn jetzt?</title>
 <meta name="mobile-web-app-capable" content="yes">
+
+<!-- Die Icons setzen -->
 <link rel="icon" sizes="192x192" href="/icon.png">
 <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
 <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
@@ -12,23 +14,39 @@
 <body bgcolor="#b0d793" >
 
 
-
-
+<!-- Der div-Container, welcher alles Buttons, Bilder usw enthalten soll-->
 <div id="inhalt" style="margin: 0 auto;width:320px;" align="center">
+
 <p><img src="pics/banner.jpg" width="320" height="80">
 </p>
 </div>
 
 <script type="text/javascript">
-	
+	<!-- In die Liste nodes sollen alle dynamisch erscheinbaren Objekte rein, also z.B. Buttons, die beim Menüwechsel verschwinden können -->
 	var nodes = [];
-	var kandidaten = ["Alex","Wözel","Patrick","Chris"];
+	<!-- Liste mit allen vorhandenen Kandidaten -->
+	var kandidaten = ["Alex","Wözel","Patrick","Henry"];
+	<!-- Liste mit allen ausgewählten Kandidaten -->
 	var ausgewaehlt = [];
 	var audio = new Audio("sounds/jeopardy.ogg");
 	
 	var div1 = document.getElementById("inhalt");
 	div1.style.font = "bold 18px Trebuchet MS"; 
 	
+	<!-- Der Ladekreis -->
+	var spinner = new Image();
+  	spinner.src = "pics/spinner.gif";
+	
+	
+	var jibbit = new Image();
+	jibbit.src = "pics/jibbit.gif";
+  	jibbit.style = "height:170px; width:200px";
+	
+	var tim = new Image();
+	tim.src = "pics/tim.gif";
+  	tim.style = "height:147px; width:200px"
+	
+	<!-- Die Grinder Bilder -->
 	var g_wenig = new Image();
   	g_wenig.src = "pics/g_wenig.png";
   	g_wenig.style = "height:150px; width:150px"
@@ -42,12 +60,45 @@
   	g_viel.style = "height:150px; width:150px"
 	
 	var g_sviel = new Image();
-  	g_sviel.src = "pics/g_viel.png";
+  	g_sviel.src = "pics/g_sviel.png";
   	g_sviel.style = "height:150px; width:150px"
 	
+		
 	
+	var warteText = [
+			"Der Tee muss noch ziehen.",
+			"Berechnungen werden durchgeführt.",
+			"$name kann doch gar nicht bauen!",
+			"Knaaaarz.",
+			'"Ein guter Tip ist die Grundlage eines jeden guten Joints"  -Jonathan',
+			"Eine Runde warten bitte!",
+			"Hier könnte dein Spruch stehen.",
+			"Wer wohl bauen muss? Ich tipp auf $name.",
+			"ACHTUNG, die Bullen kommen!",
+			'"Bau mal einen!" -Patrick',
+			'"Die Welt gehört denen, die draußen sind!" -Albrecht',
+			'Meddl Leute!',
+			"Wololooo!",
+			//"Drogenschiff Treueeee! Kein Bock! Aber auch kein Bock auf Schimmelkelleeeeeeeeeer!"
+			
+					
+	];
+	<!-- Soll am Morgen bestimmte Sprüche hinzufügen, noch nicht getestet-->
+	var objDate = new Date();
+	var hours = objDate.getHours();
+	if(hours < 11 && hours > 6){
+		warteText.push("Ein Joint am Morgen vertreibt Kummer und Sorgen");
+		warteText.push("Am Morgen ein Joint und der Tag ist dein Freund");
+	}else if(hours > 16 && hours < 17){
+		warteText.push('"Patrick, es ist 16 Uhr! Wie kannst du schon wieder voll sein? xD" -Marvin');
+	}
+		
+	shuffle(warteText);
+	
+	<!-- So jetzt gehts Los -->
 	hauptmenue();
 	
+	<!-- Baut das Hauptmenü auf -->
 	function hauptmenue(){
 		loescheInhalt();
 		
@@ -62,37 +113,48 @@
 		
 	}
 	
+	
+		
+	<!-- Baut das "Wartemenü" auf-->
 	function los(){
+		loescheInhalt();
 		
 		audio.play();
 		audio.addEventListener("ended", function(){
    			  ergebnis();
 		});
 		
-		loescheInhalt();
-		var spinner = new Image();
-  		spinner.src = "pics/spinner.gif";
+		rndName = rndElem(ausgewaehlt);
   		//banner.style = "height:80px; width:320px"
-		nodes.push(spinner);
-		div1.appendChild(spinner);
+		var r1 = getRandomInt(1,100);
+		if(r1 <= 70){
+			nodes.push(spinner);
+			div1.appendChild(spinner);
+			
+			
+		}else if(r1 <= 70 + 20){
+			nodes.push(jibbit);
+			div1.appendChild(jibbit);
+			
+			
+		}else{
+			nodes.push(tim);
+			div1.appendChild(tim);
+		}
 		
-		var warteText = [
-			"Der Tee muss noch ziehen.",
-			"Berechnungen werden durchgeführt.",
-			rndElem(ausgewaehlt) + " kann doch gar nicht bauen!",
-			"Einmal bitte kurz warten...",
-			"Knaaaarz.",
-			'"Ein guter Tipp ist die Grundlage eines jeden guten Joints"  -Jonathan',
-			"Eine Runde warten bitte!",
-			"Hier könnte dein Spruch stehen.",
-			"Wer wohl bauen muss? Ich tipp auf " + rndElem(ausgewaehlt) + "."		
-		];
 		
-		var txt1 = addTxt(rndElem(warteText),"15px","grey");
+		for(i in warteText){
+			warteText[i] = warteText[i].replace("$name",rndName);
+		}
+		
+		
+		
+		var txt1 = addTxt(warteText.pop(),"15px","grey");
 		txt1.style.textAlign = "center";
 				
 	}
 	
+	<!-- Baut das Ergebnismenü auf-->
 	function ergebnis(){
 		loescheInhalt();
 		var bauer = rndElem(ausgewaehlt)
@@ -121,11 +183,40 @@
 		}
 		mengeTxt.style.textAlign = "center";
 		
+		addTxt("Rauch-Reihenfolge:");
+		
+		var bI = 0;
+		for(i in ausgewaehlt){
+			if(ausgewaehlt[i] == bauer){
+				bI = i;
+				break;
+			}
+		}
+		
+		var rest = [];
+		
+		for(i in ausgewaehlt){
+			if(i != bI){
+				rest.push(ausgewaehlt[i]);	
+			}
+		}
+		
+		
+		shuffle(rest);
+		var reihe = bauer;	
+		for(i in rest){
+			reihe += ",   " + rest[i];
+		}			
+			
+		addTxt(reihe,"13px","#616161")
+		
+		
 		addP();
 		addButton("Fertig gebaut.",function(){hauptmenue()});
 		
 	}
 	
+	<!-- Baut das Kandidaten hinzufügen Menü auf-->
 	function kandidat(){
 	    loescheInhalt();
 		addTxt("Name:");
@@ -160,6 +251,7 @@
 			
 	}
 	
+	<!-- Baut Kandidaten wählen Menü auf-->
 	function wahlKandidat(){
 		loescheInhalt();
 		var bts = [];
@@ -195,7 +287,7 @@
 	}
 	
 	
-	
+	<!-- Erzeugt ein Eingabefeld und fügt es (in den div Container, und zur nodes Liste) hinzu-->
 	function addField(){
 		var field = document.createElement("input");
 		field.style = "height:30px; width:320px"
@@ -205,6 +297,7 @@
 		return field;
 	}
 	
+	<!-- Erzeugt einen leeren Paragraphen und fügt es hinzu (Um z.B. Lücken zu Erschaffen)-->
 	function addP(){
 		var txtP = document.createElement("p");
 		div1.appendChild(txtP);
@@ -215,9 +308,20 @@
 	function addTxt(string){
 		 return addTxt(string, null, null);
 	}
-		
+	
+	// Erzeugt ein Textfeld und fügt es hinzu
+	//@param string Textinhalt
+	//@param size Textgröße
+	//@param color Textfarbe
 	function addTxt(string, size, color){
+		
+		
 		var txtP = addP();
+		if(string == null){
+			return txtP;	
+		}
+		
+		
 		var txtNode = document.createTextNode(string);
 		txtP.style.textAlign = "left";
 		//txtNode.data.style.
@@ -232,17 +336,22 @@
 		return txtP;
 	}
 	
+	// Fügt ein Bild hinzu
 	function addImage(img){
 		nodes.push(img);
 		div1.appendChild(img);	
 		
 	}
 	
+	
 	function addButton(name, fkt){
 		return addButton(name, fkt, false);	
 	}
 	
-	
+	// Erzeugt ein Buttion und fügt es hinzu
+	//@param name Text des Buttons
+	//@param fkt Auszulösende Funktion beim Draufklicken
+	//@param chooseButton Ob es ein Wahlbutton ist, also wie beim Kandidaten wählen, welcher von grün zu rot wechselt
 	function addButton(name, fkt, chooseButton){
 		var b1 = document.createElement("input");
 		
@@ -274,6 +383,7 @@
 		
 	}
 	
+	//Wechselt die Farbe eines "Wahlbuttons"
 	function toggleButton(b1){
 		
 		if(b1.name == "activated"){
@@ -287,7 +397,7 @@
 		}
 	}
 	
-	
+	//Löscht alle Elemente aus der Node Liste, diese werden nicht mehr angezeigt
 	function loescheInhalt(){
 		for(i = 0; i < nodes.length; i++){
 			nodes[i].remove();
@@ -300,8 +410,24 @@
    		 return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 	
+	//Gibt ein zufälliges Element einer List wieder
 	function rndElem(list){
 		return list[getRandomInt(0, list.length-1)]	;
+	}
+	
+	/**
+	* Ausm Internet:
+	 * Shuffles array in place.
+	 * @param {Array} a items The array containing the items.
+	 */
+	function shuffle(a) {
+ 	   var j, x, i;
+ 	   for (i = a.length; i; i--) {
+  	      j = Math.floor(Math.random() * i);
+  	      x = a[i - 1];
+  	      a[i - 1] = a[j];
+  	      a[j] = x;
+   		}
 	}
 
   </script>
